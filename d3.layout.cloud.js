@@ -13,7 +13,7 @@
         spiral = archimedeanSpiral,
         words = [],
         timeInterval = Infinity,
-        event = d3.dispatch("word", "end"),
+        event = d3.dispatch("word", "end", "fail"),
         timer = null,
         cloud = {};
 
@@ -42,13 +42,15 @@
 
       function step() {
         var start = +new Date,
-            d;
+            d,
+            placed;
         while (+new Date - start < timeInterval && ++i < n && timer) {
           d = data[i];
           d.x = (size[0] * (Math.random() + .5)) >> 1;
           d.y = (size[1] * (Math.random() + .5)) >> 1;
           cloudSprite(d, data, i);
-          if (d.hasText && place(board, d, bounds)) {
+          placed = ( d.hasText && place(board, d, bounds) );
+          if ( placed ) {
             tags.push(d);
             event.word(d);
             if (bounds) cloudBounds(bounds, d);
@@ -56,6 +58,9 @@
             // Temporary hack
             d.x -= size[0] >> 1;
             d.y -= size[1] >> 1;
+          }
+          else {
+              event.fail(d);
           }
         }
         if (i >= n) {
