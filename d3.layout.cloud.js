@@ -13,11 +13,12 @@
         spiral = archimedeanSpiral,
         words = [],
         timeInterval = Infinity,
-        event = d3.dispatch("word", "end", "fail"),
+        event = d3.dispatch("word", "start", "stop", "end", "fail"),
         timer = null,
         cloud = {};
 
     cloud.start = function() {
+        event.start();
       var board = zeroArray((size[0] >> 5) * size[1]),
           bounds = null,
           n = words.length,
@@ -60,7 +61,7 @@
             d.y -= size[1] >> 1;
           }
           else {
-              event.fail(d);
+              event.fail(d, i, bounds);
           }
         }
         if (i >= n) {
@@ -71,6 +72,7 @@
     }
 
     cloud.stop = function() {
+      event.stop();
       if (timer) {
         clearInterval(timer);
         timer = null;
